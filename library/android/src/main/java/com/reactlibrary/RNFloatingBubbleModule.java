@@ -39,14 +39,6 @@ public class RNFloatingBubbleModule extends ReactContextBaseJavaModule {
     // }
   }
 
-  @ReactMethod
-  public void reopenApp(){
-    Intent launchIntent = reactContext.getPackageManager().getLaunchIntentForPackage(reactContext.getPackageName());
-    if (launchIntent != null) {
-      reactContext.startActivity(launchIntent);
-    }
-  }
-
   @Override
   public String getName() {
     return "RNFloatingBubble";
@@ -60,8 +52,22 @@ public class RNFloatingBubbleModule extends ReactContextBaseJavaModule {
     } catch (Exception e) {
       promise.reject("");
     }
-  }  
-
+  }
+  @ReactMethod // Notates a method that should be exposed to React
+  public void isBubbleOpen(final Promise promise) {
+    try {
+      promise.resolve(this.bubbleView != null);
+    } catch (Exception e) {
+      promise.reject("");
+    }
+  }
+  @ReactMethod
+  public void reopenApp(){
+    Intent launchIntent = reactContext.getPackageManager().getLaunchIntentForPackage(reactContext.getPackageName());
+    if (launchIntent != null) {
+      reactContext.startActivity(launchIntent);
+    }
+  }
   @ReactMethod // Notates a method that should be exposed to React
   public void hideFloatingBubble(final Promise promise) {
     try {
@@ -70,16 +76,16 @@ public class RNFloatingBubbleModule extends ReactContextBaseJavaModule {
     } catch (Exception e) {
       promise.reject("");
     }
-  }  
-  
+  }
+
   @ReactMethod // Notates a method that should be exposed to React
   public void requestPermission(final Promise promise) {
     try {
       this.requestPermissionAction(promise);
     } catch (Exception e) {
     }
-  }  
-  
+  }
+
   @ReactMethod // Notates a method that should be exposed to React
   public void checkPermission(final Promise promise) {
     try {
@@ -87,8 +93,8 @@ public class RNFloatingBubbleModule extends ReactContextBaseJavaModule {
     } catch (Exception e) {
       promise.reject("");
     }
-  }  
-  
+  }
+
   @ReactMethod // Notates a method that should be exposed to React
   public void initialize(final Promise promise) {
     try {
@@ -97,7 +103,7 @@ public class RNFloatingBubbleModule extends ReactContextBaseJavaModule {
     } catch (Exception e) {
       promise.reject("");
     }
-  }  
+  }
 
   private void addNewBubble(int x, int y) {
     this.removeBubble();
@@ -143,7 +149,7 @@ public class RNFloatingBubbleModule extends ReactContextBaseJavaModule {
       Intent intent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION, Uri.parse("package:" + reactContext.getPackageName()));
       Bundle bundle = new Bundle();
       reactContext.startActivityForResult(intent, 0, bundle);
-    } 
+    }
     if (hasPermission()) {
       promise.resolve("");
     } else {
@@ -153,19 +159,20 @@ public class RNFloatingBubbleModule extends ReactContextBaseJavaModule {
 
   private void initializeBubblesManager() {
     bubblesManager = new BubblesManager.Builder(reactContext).setTrashLayout(R.layout.bubble_trash_layout)
-        .setInitializationCallback(new OnInitializedCallback() {
-          @Override
-          public void onInitialized() {
-            // addNewBubble();
-          }
-        }).build();
+            .setInitializationCallback(new OnInitializedCallback() {
+              @Override
+              public void onInitialized() {
+                // addNewBubble();
+              }
+            }).build();
     bubblesManager.initialize();
   }
 
   private void sendEvent(String eventName) {
     WritableMap params = Arguments.createMap();
     reactContext
-      .getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class)
-      .emit(eventName, params);
+            .getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class)
+            .emit(eventName, params);
   }
 }
+
